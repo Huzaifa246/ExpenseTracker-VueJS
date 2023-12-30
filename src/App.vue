@@ -1,36 +1,35 @@
 <template>
   <Header />
   <div class="container">
-    <Balance :total="+total" /> <!-- +total = to convert string to number-->
-    <IncomeExpenses :income="+income" :expenses="+expenses"/>
-    <TransactionList :transactions="transactions" />
-    <AddTransactions @addTransactionSubmitted="handleTransactionSubmitted"/>
+    <Balance :total="+total" />
+    <!-- +total = to convert string to number-->
+    <IncomeExpenses :income="+income" :expenses="+expenses" />
+    <TransactionList
+      :transactions="transactions"
+      @transactionDeleted="handleTransactionDeleted"
+    />
+    <AddTransactions @addTransactionSubmitted="handleTransactionSubmitted" />
   </div>
 </template>
 
 <script setup>
-import Header from './components/Header.vue';
-import Balance from './components/Balance.vue';
-import IncomeExpenses from './components/IncomeExpenses.vue';
-import TransactionList from './components/TransactionList.vue';
-import AddTransactions from './components/AddTransactions.vue';
-// export default {
-//   components: {
-//     Header,
-//     Balance,
-//     IncomeExpenses,
-//     TransactionList,
-//     AddTransactions
-//   }
-// }
-import { ref, computed } from 'vue';
-const transactions = ref([
-  { id: 1, text: "Flower", amount: -20 },
-  { id: 2, text: "Basket1", amount: -10 },
-  { id: 3, text: "Camera", amount: 10 },
-  { id: 4, text: "Salary", amount: 250 },
-]);
+import Header from "./components/Header.vue";
+import Balance from "./components/Balance.vue";
+import IncomeExpenses from "./components/IncomeExpenses.vue";
+import TransactionList from "./components/TransactionList.vue";
+import AddTransactions from "./components/AddTransactions.vue";
+import { ref, computed, onMounted } from "vue";
 
+import { useToast } from "vue-toastification";
+const toast = useToast();
+const transactions = ref([]);
+
+onMounted(() => {
+  const savedTransactions = JSON.parse(localStorage.getItem("transactions"));
+  if (savedTransactions) {
+    transactions.value = savedTransactions;
+  }
+});
 // Get total
 const total = computed(() => {
   return transactions.value.reduce((acc, transaction) => {
@@ -40,27 +39,51 @@ const total = computed(() => {
 
 // Get Income
 const income = computed(() => {
-  return transactions?.value.filter((transaction) =>
-  transaction.amount > 0) // greater than 0
+  return transactions?.value
+    .filter((transaction) => transaction.amount > 0) // greater than 0
     .reduce((acc, transaction) => {
       return acc + transaction.amount;
-    }, 0).toFixed(2);
+    }, 0)
+    .toFixed(2);
 });
 
 const expenses = computed(() => {
-  return transactions?.value.filter((transaction) => 
-  transaction?.amount < 0)
+  return transactions?.value
+    .filter((transaction) => transaction?.amount < 0)
     .reduce((acc, transaction) => {
-      return acc + transaction.amount
-    }, 0).toFixed(2);
+      return acc + transaction.amount;
+    }, 0)
+    .toFixed(2);
 });
 
-
-const handleTransactionSubmitted = (newTransactionData) => {
-  transactions.value.push(
+const handleTransactionSubmitted = (transactionData) => {
+  transactions.value.push({
     id: generateUniqueId(),
-    text: transactionData?.text,
-    amount: transactionData?.amount
+    text: transactionData.text,
+    amount: transactionData.amount,
+  });
+
+  saveTransactionsToLocalStorage();
+  toast.success("Transaction ADDED");
+};
+
+const generateUniqueId = () => {
+  const timestamp = new Date().getTime();
+  const randomNumber = Math.floor(Math.random() * 1000000);
+  return `${timestamp}-${randomNumber}`;
+};
+
+const handleTransactionDeleted = (id) => {
+  transactions.value = Array.from(transactions.value).filter(
+    (transaction) => transaction?.id !== id
   );
-}
+  saveTransactionsToLocalStorage();
+  toast.success("Transaction deleted");
+};
+
+
+// Save transactions to local storage
+const saveTransactionsToLocalStorage = () => {
+  localStorage.setItem("transactions", JSON.stringify(transactions.value));
+};
 </script>

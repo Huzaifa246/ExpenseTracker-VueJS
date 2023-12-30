@@ -1,15 +1,32 @@
 # vue-expense-tracker
 
-This template should help get you started developing with Vue 3 in Vite.
 
-## Recommended IDE Setup
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
+# learning
 
-## Customize configuration
+<!-- 
+defineEmits is a function = Composition API to declare custom events it emits. 
+It's part of @vue/runtime-core package. Used in setup function of a component to define custom events 
+const emit = defineEmits(['customEvent1', 'customEvent2']); -->
 
-See [Vite Configuration Reference](https://vitejs.dev/config/).
-
+<!-- //  export default {
+// data() {
+//     return {
+//         transactions: [
+//             { id: 1, text: "Flower", amount: -20 },
+//             { id: 2, text: "Basket1", amount: -10 },
+//             { id: 3, text: "Camera", amount: 10 },
+//             { id: 4, text: "Book", amount: 150 },
+//         ],
+//     }
+// }
+//2nd method to define
+// setup() {
+//     return {
+//         transactions
+//     }
+// }
+// } -->
 ## Project Setup
 
 ```sh
